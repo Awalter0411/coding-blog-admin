@@ -1,0 +1,47 @@
+.select {
+  margin-left: 20px;
+}
+
+.markdown-content {
+  outline: none;
+  border: none;
+  padding: 5px;
+  width: 95%;
+  height: 67vh;
+  margin-top: 10px;
+  overflow: auto;
+}
+
+.html-content {
+  background-color: #fff;
+  outline: none;
+  height: 67vh;
+  border: none;
+  width: 95%;
+  margin-top: 10px;
+  overflow: auto;
+}
+
+.saveArticle {
+  margin-right: 5px;
+}
+
+.description-markdown {
+  outline: none;
+  border: none;
+  width: 100%;
+  margin-top: 10px;
+  padding: 5px;
+  height: 10vh;
+}
+
+.description-html {
+  background-color: #fff;
+  width: 100%;
+  height: 10vh;
+  margin-top: 10px;
+}
+
+.datePicker {
+  margin-top: 10px;
+}

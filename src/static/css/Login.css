@@ -1,0 +1,11 @@
+.login-container{
+  width: 400px;
+  margin: 150px auto;
+}
+.user{
+  display: flex;
+}
+
+body{
+  background-color: #f0f0f0;
+}
