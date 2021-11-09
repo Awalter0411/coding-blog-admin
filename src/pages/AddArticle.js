@@ -1,49 +1,61 @@
 import '../static/css/AddArticle.css'
 import { useState } from 'react'
 import { Row, Col, Input, Select, Button, DatePicker } from 'antd'
-import marked from 'marked'
-import hljs from 'highlight.js'
-import 'highlight.js/styles/monokai-sublime.css'
-const { Option } = Select
+import ReactMarkdown from 'react-markdown'
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
+import moment from 'moment'
+import 'moment/locale/zh-cn'
+import locale from 'antd/es/date-picker/locale/zh_CN'
 const { TextArea } = Input
 const AddArticle = () => {
-  const [articleContent, setArticleContent] = useState('') //markdown的编辑内容
-  const [markdownContent, setMarkdownContent] = useState('预览内容') //html内容
+  // antd
+  const { Option } = Select
+  // 文章标题
+  const [title, setTitle] = useState('')
+  // 文章内容
+  const [articleContent, setArticleContent] = useState('')
+  // 简介内容
+  const [descriptionContent, setDescriptionContent] = useState('') 
+  // 时间
+  const [date, setDate] = useState('')
+  // 分类
+  const [categories, setCategories] = useState([])
 
-  marked.setOptions({
-    renderer: new marked.Renderer(),
-    highlight: function (code) {
-      return hljs.highlightAuto(code).value
-    },
-    gfm: true, // 允许 Git Hub标准的markdown.
-    pedantic: false, // 不纠正原始模型任何的不良行为和错误（默认为false）
-    sanitize: false, // 对输出进行过滤（清理），将忽略任何已经输入的html代码（标签）
-    tables: true, // 允许支持表格语法（该选项要求 gfm 为true）
-    breaks: false, // 允许回车换行（该选项要求 gfm 为true）
-    smartLists: true, // 使用比原生markdown更时髦的列表
-    smartypants: false, // 使用更为时髦的标点
-  })
-
-  const changeContent = e => {
-    setArticleContent(e.target.value)
-    let html = marked(e.target.value)
-    setMarkdownContent(html)
+  // 更新文章内容
+  const changeInput = (e, callback) => {
+    callback(e.target.value)
   }
+
+  // 设置文章日期
+  const handleDateChange = (date, dateString) => {
+    console.log(date, dateString)
+    setDate(dateString)
+  }
+
+  const publish = () => {
+    console.log(articleContent, descriptionContent)
+  }
+
   return (
     <div>
       <Row className='content'>
         <Col span={17}>
           <Row>
-            <Col span={18}>
+            <Col span={18} className="title">
               <Input placeholder='博客标题' />
             </Col>
             <Col span={6}>
               <Select
-                defaultValue='JavaScript'
                 style={{ width: 120 }}
                 className='select'
+                placeholder="请选择分类"
               >
-                <Option value='JavaScript'>JavaScript</Option>
+                {categories.map(item => {
+                  if (item) {
+                    return <Option value={item.name}>{item.name}</Option>
+                  }
+                })}
               </Select>
             </Col>
           </Row>
@@ -51,36 +63,96 @@ const AddArticle = () => {
             <Col span={12}>
               <TextArea
                 className='markdown-content'
-                autoSize={{ minRows: 20, maxRows: 20 }}
-                onChange={changeContent}
-                onPressEnter={changeContent}
+                onChange={e => {
+                  changeInput(e, setArticleContent)
+                }}
+                placeholder='请输入文章内容'
+                showCount
+                autoSize={{ minRows: 28, maxRows: 28 }}
               ></TextArea>
             </Col>
             <Col span={12}>
-              <div className='html-content'></div>
+              <div className='html-content'>
+                <ReactMarkdown
+                  children={articleContent}
+                  components={{
+                    code({ node, inline, className, children, ...props }) {
+                      const match = /language-(\w+)/.exec(className || '')
+                      return !inline && match ? (
+                        <SyntaxHighlighter
+                          children={String(children).replace(/\n$/, '')}
+                          style={atomDark}
+                          language={match[1]}
+                          PreTag='div'
+                          {...props}
+                        />
+                      ) : (
+                        <code className={className} {...props}>
+                          {children}
+                        </code>
+                      )
+                    },
+                  }}
+                />
+              </div>
             </Col>
           </Row>
         </Col>
         <Col span={7}>
           <Row>
             <Button className='saveArticle'>暂存文章</Button>
-            <Button type='primary'>发布文章</Button>
+            <Button type='primary' onClick={publish}>
+              发布文章
+            </Button>
           </Row>
           <Row>
             <Col span={24}>
               <TextArea
-                className='description-markdown'
-                autoSize={{ minRows: 4, maxRows: 4 }}
+                cols='30'
+                rows='10'
+                className='description-content'
+                onChange={e => {
+                  changeInput(e, setDescriptionContent)
+                }}
+                autoSize={{ minRows: 5, maxRows: 5 }}
+                placeholder='请输入文章简介'
               ></TextArea>
             </Col>
           </Row>
           <Row>
             <Col span={24}>
-              <div className='description-html'></div>
+              <div className='description-html'>
+                <ReactMarkdown
+                  children={descriptionContent}
+                  components={{
+                    code({ node, inline, className, children, ...props }) {
+                      const match = /language-(\w+)/.exec(className || '')
+                      return !inline && match ? (
+                        <SyntaxHighlighter
+                          children={String(children).replace(/\n$/, '')}
+                          style={atomDark}
+                          language={match[1]}
+                          PreTag='div'
+                          {...props}
+                        />
+                      ) : (
+                        <code className={className} {...props}>
+                          {children}
+                        </code>
+                      )
+                    },
+                  }}
+                />
+              </div>
             </Col>
           </Row>
           <Row className='datePicker'>
-            <DatePicker showTime format='YYYY-MM-DD' />
+            创建时间：
+            <DatePicker
+              onChange={handleDateChange}
+              format='YYYY-MM-DD'
+              locale={locale}
+            />
           </Row>
         </Col>
       </Row>
