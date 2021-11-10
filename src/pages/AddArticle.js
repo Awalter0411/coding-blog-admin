@@ -38,7 +38,7 @@ const AddArticle = () => {
   }
 
   useEffect(() => {
-    setDescription(content.slice(1, 30))
+    setDescription(content.slice(0, 30))
     return () => {}
   }, [content])
 
