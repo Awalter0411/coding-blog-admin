@@ -1,16 +1,35 @@
 import { useState } from 'react'
-import { Card, Input, Button, Spin } from 'antd'
+import { Card, Input, Button, Spin, message } from 'antd'
 import { UserOutlined, KeyOutlined } from '@ant-design/icons'
 import '../static/css/Login.css'
+import request from '../request/request'
+import { useNavigate } from 'react-router-dom'
 const Login = () => {
   const [userName, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const navigate = useNavigate()
   const checkLogin = () => {
     setIsLoading(true)
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 1000)
+    request
+      .post('/users/login', {
+        username: userName,
+        password: password,
+      })
+      .then(res => {
+        message.success('登录成功')
+        console.log(res.data)
+        localStorage.setItem('token', res.data.token)
+        setTimeout(() => {
+          navigate('/index', { replace: true })
+          setIsLoading(false)
+        }, 2000)
+      })
+      .catch(err => {
+        setIsLoading(false)
+        message.error('用户名或密码错误')
+        console.log(err)
+      })
   }
   return (
     <div className='login-container'>
@@ -36,7 +55,14 @@ const Login = () => {
               setPassword(e.target.value)
             }}
           />
-          <Button style={{marginTop:'20px'}} type='primary' size='large' block onClick={checkLogin}>
+          <Button
+            style={{ marginTop: '20px' }}
+            type='primary'
+            size='large'
+            block
+            onClick={checkLogin}
+            loading={isLoading}
+          >
             登录
           </Button>
         </Card>

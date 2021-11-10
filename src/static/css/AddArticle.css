@@ -27,8 +27,9 @@
   width: 95%;
   margin-top: 10px;
   overflow: auto;
-  height: 65vh;
   padding: 5px;
+  max-height: 340px;
+  min-height: 50px;
 }
 
 .saveArticle {
@@ -58,4 +59,14 @@
   margin-top: 20px;
   height: 20px;
   line-height: 35px;
+}
+
+.editor-container{
+  margin-top: 20px;
+  margin-left: 5px;
+}
+
+
+.CodeMirror cm-s-default{
+  height: 100vh;
 }

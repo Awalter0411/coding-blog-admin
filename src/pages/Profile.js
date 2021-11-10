@@ -1,7 +1,7 @@
 const Profile = () => {
   return ( 
     <div>
-      profile
+      个人设置
     </div>
    );
 }
