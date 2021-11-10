@@ -4,6 +4,7 @@ import { UserOutlined, KeyOutlined } from '@ant-design/icons'
 import '../static/css/Login.css'
 import request from '../request/request'
 import { useNavigate } from 'react-router-dom'
+
 const Login = () => {
   const [userName, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -49,6 +50,7 @@ const Login = () => {
           <Input
             id='password'
             size='large'
+            type="password"
             placeholder='输入你的密码'
             prefix={<KeyOutlined />}
             onChange={e => {

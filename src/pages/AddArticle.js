@@ -15,6 +15,8 @@ const AddArticle = () => {
   const [content, setContent] = useState('')
   // 分类
   const [categories, setCategories] = useState([])
+  const [categoryId, setCategoryId] = useState(0)
+  // 简介
   const [description, setDescription] = useState('')
 
   // 发布文章的回调
@@ -25,6 +27,7 @@ const AddArticle = () => {
         title,
         description,
         content,
+        category:categoryId
       })
       .then(res => {
         message.success('发布文章成功')
@@ -37,11 +40,21 @@ const AddArticle = () => {
       })
   }
 
+  useEffect(()=>{
+    request.get("categories/list").then(res => {
+      console.log(res.data);
+      setCategories(res.data)
+    })
+  },[])
+
   useEffect(() => {
     setDescription(content.slice(0, 30))
     return () => {}
   }, [content])
 
+  const handleCateChange = (val) =>{
+    setCategoryId(val)
+  }
   return (
     <div>
       <Row className='content'>
@@ -58,10 +71,11 @@ const AddArticle = () => {
                 style={{ width: 150 }}
                 className='select'
                 placeholder='请选择分类'
+                onChange={handleCateChange}
               >
                 {categories.map(item => {
                   if (item) {
-                    return <Option value={item.name}>{item.name}</Option>
+                    return <Option key={item.id} value={item.id}>{item.name}</Option>
                   }
                 })}
               </Select>
