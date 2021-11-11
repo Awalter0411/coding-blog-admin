@@ -1,0 +1,11 @@
+.site-card-border-less-wrapper {
+  width: 800px;
+  margin: 0 auto;
+  padding: 30px;
+}
+
+.button-container{
+  display: flex;
+  justify-content: flex-end;
+  margin-right: 30px;
+}

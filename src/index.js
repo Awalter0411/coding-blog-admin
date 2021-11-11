@@ -23,6 +23,7 @@ ReactDOM.render(
           <Route path='index' element={<Home />}>
             <Route path='workspace' element={<WorkSpace />} />
             <Route path='addArticle' element={<AddArticle />} />
+            <Route path='addArticle/:id' element={<AddArticle />} />
             <Route path='articleList' element={<ArticleList />} />
             <Route path='articleCate' element={<ArticleCate />} />
             <Route path='profile' element={<Profile />} />

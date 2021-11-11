@@ -8,29 +8,49 @@ import {
 import { useState } from 'react'
 import { Link, Outlet } from 'react-router-dom'
 import '../static/css/Home.css'
+import PubSub from 'pubsub-js'
 
-const { Header, Content, Footer, Sider } = Layout
+const { Content, Footer, Sider } = Layout
 const { SubMenu } = Menu
 
 function Home() {
+  let [selectedKeys, setSelectedKeys] = useState(['1'])
+  PubSub.subscribe('selectKey', (msg, data) => {
+    setSelectedKeys(data)
+  })
   const [collapsed, setCollapsed] = useState(false)
 
   const onCollapse = collapsed => {
     setCollapsed(collapsed)
   }
 
+  const changeNav = ({ item, key, keyPath, domEvent }) => {
+    setSelectedKeys(keyPath)
+  }
+
+  const openChange =(openKeys) => {
+    console.log(openKeys) 
+  }
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sider collapsible collapsed={collapsed} onCollapse={onCollapse}>
         <div className='logo'></div>
-        <Menu theme='dark' defaultSelectedKeys={['1']} mode='inline'>
+        <Menu
+          onClick={changeNav}
+          theme='dark'
+          defaultSelectedKeys={['1']}
+          mode='inline'
+          selectedKeys={selectedKeys}
+          onOpenChange={openChange}
+        >
           <Menu.Item key='1' icon={<CoffeeOutlined />}>
             <Link to='workspace'>工作台</Link>
           </Menu.Item>
           <Menu.Item key='2' icon={<FileAddOutlined />}>
-            <Link to='addArticle'>添加文章</Link>
+            <Link to='addArticle'>写点文章</Link>
           </Menu.Item>
-          <SubMenu key='sub1' icon={<FileTextOutlined />} title='文章管理'>
+          <SubMenu  key='sub1' icon={<FileTextOutlined />} title='文章管理'>
             <Menu.Item key='3'>
               <Link to='articleList'>文章列表</Link>
             </Menu.Item>
@@ -39,9 +59,7 @@ function Home() {
             </Menu.Item>
           </SubMenu>
           <Menu.Item key='5' icon={<UserOutlined />}>
-            <Link to="profile">
-              个人设置
-            </Link>
+            <Link to='profile'>个人设置</Link>
           </Menu.Item>
         </Menu>
       </Sider>
@@ -52,7 +70,6 @@ function Home() {
             <Breadcrumb.Item>工作台</Breadcrumb.Item>
           </Breadcrumb>
           <div className='site-layout-background'>
-            {/* <Route path='/index' exact component={AddArticle}></Route> */}
             <Outlet />
           </div>
         </Content>

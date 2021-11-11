@@ -19,17 +19,13 @@ const Login = () => {
       })
       .then(res => {
         message.success('登录成功')
-        console.log(res.data)
         localStorage.setItem('token', res.data.token)
-        setTimeout(() => {
-          navigate('/index', { replace: true })
-          setIsLoading(false)
-        }, 2000)
+        navigate('/index', { replace: true })
+        setIsLoading(false)
       })
       .catch(err => {
         setIsLoading(false)
         message.error('用户名或密码错误')
-        console.log(err)
       })
   }
   return (
@@ -50,7 +46,7 @@ const Login = () => {
           <Input
             id='password'
             size='large'
-            type="password"
+            type='password'
             placeholder='输入你的密码'
             prefix={<KeyOutlined />}
             onChange={e => {

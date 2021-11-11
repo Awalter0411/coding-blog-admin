@@ -7,59 +7,87 @@ import {
   message,
   Space,
   Popconfirm,
+  Spin,
 } from 'antd'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import '../static/css/ArticleCate.css'
 import request from '../request/request'
 
 const ArticleCate = () => {
+  // 模态框显示
   const [visible, setVisible] = useState(false)
+  // 加载中
   const [confirmLoading, setConfirmLoading] = useState(false)
+  // 分类名称
   const [cateName, setCateName] = useState('')
+  // 分类
+  const [categories, setCategories] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
+  const input = useRef(null)
 
+  // 显示模态框
   const showModal = () => {
     setVisible(true)
   }
 
+  // 确认添加分类
   const handleOk = () => {
     setConfirmLoading(true)
+    setIsLoading(true)
     request
       .post('/categories/create', {
         name: cateName,
       })
       .then(res => {
-        console.log(res)
         message.success('添加成功')
         setVisible(false)
         setConfirmLoading(false)
+        setIsLoading(false)
+        setCategories(
+          res.data.map(item => {
+            item.key = item.id
+            return item
+          })
+        )
+        setCateName('')
       })
       .catch(err => {
-        console.log(err)
         message.error('分类已经存在')
         setConfirmLoading(false)
+        setIsLoading(false)
       })
   }
 
+  // 取消添加
   const handleCancel = () => {
     setVisible(false)
   }
 
-  const [categories, setCategories] = useState([])
-
   useEffect(() => {
+    setIsLoading(true)
     request.get('/categories/list').then(res => {
-      console.log(res)
       const categories = res.data.map(item => {
         item.key = item.id
         return item
       })
       setCategories(categories)
+      setIsLoading(false)
     })
   }, [])
 
-  const confirmDelete = (e,record) =>{
-    console.log(record);
-    message.success('删除成功')
+  // 删除分类的回调
+  const confirmDelete = (e, record) => {
+    setIsLoading(true)
+    request.delete('/categories/delete/' + record.id).then(res => {
+      setCategories(
+        res.data.map(item => {
+          item.key = item.id
+          return item
+        })
+      )
+      message.success('删除成功')
+      setIsLoading(false)
+    })
   }
 
   const columns = [
@@ -97,41 +125,44 @@ const ArticleCate = () => {
 
   return (
     <div>
-      <Button type='primary' onClick={showModal}>
-        添加分类
-      </Button>
-      <Modal
-        title='添加分类'
-        visible={visible}
-        onOk={handleOk}
-        confirmLoading={confirmLoading}
-        onCancel={handleCancel}
-      >
-        <Form
-          name='basic'
-          labelCol={{ span: 6 }}
-          wrapperCol={{ span: 16 }}
-          initialValues={{ remember: true }}
-          autoComplete='off'
-          className='addCateForm'
+      <Spin tip='loading' spinning={isLoading}>
+        <Button type='primary' onClick={showModal}>
+          添加分类
+        </Button>
+        <Modal
+          title='添加分类'
+          visible={visible}
+          onOk={handleOk}
+          confirmLoading={confirmLoading}
+          onCancel={handleCancel}
         >
-          <Form.Item
-            label='分类名称'
-            name='cateName'
-            rules={[{ required: true, message: '分类名称不能为空' }]}
+          <Form
+            name='basic'
+            labelCol={{ span: 6 }}
+            wrapperCol={{ span: 16 }}
+            initialValues={{ remember: true }}
+            autoComplete='off'
+            className='addCateForm'
           >
-            <Input
-              value={cateName}
-              onChange={e => setCateName(e.target.value)}
-            />
-          </Form.Item>
-        </Form>
-      </Modal>
-      <Table
-        columns={columns}
-        dataSource={categories}
-        style={{ marginTop: 20 + 'px' }}
-      />
+            <Form.Item
+              label='分类名称'
+              name='cateName'
+              rules={[{ required: true, message: '分类名称不能为空' }]}
+            >
+              <Input
+                value={cateName}
+                ref={input}
+                onChange={e => setCateName(e.target.value)}
+              />
+            </Form.Item>
+          </Form>
+        </Modal>
+        <Table
+          columns={columns}
+          dataSource={categories}
+          style={{ marginTop: 20 + 'px' }}
+        />
+      </Spin>
     </div>
   )
 }

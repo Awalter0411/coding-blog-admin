@@ -1,14 +1,43 @@
-import { Table, Space, Button, message, Popconfirm } from 'antd'
+import { Table, Space, Button, message, Popconfirm, Spin } from 'antd'
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router'
+import PubSub from 'pubsub-js'
 import request from '../request/request'
 const ArticleList = () => {
   const [dataSource, setDataSource] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
+  const navigate = useNavigate()
 
-  const confirmDelete = (e, record) => {
-    request.delete('/articles/delete/' + record.id).then(res => {
-      message.success('删除成功')
+  // 处理请求的文章数据
+  const formatData = res => {
+    return res.data.map(item => {
+      item.key = item.id
+      item.createTime = item.createTime.slice(0, 10)
+      item.categoryName = item.category.name
+      return item
     })
   }
+  // 确认删除的回调
+  const confirmDelete = (e, record) => {
+    setIsLoading(true)
+    request
+      .delete('/articles/delete/' + record.id)
+      .then(res => {
+        setIsLoading(false)
+        setDataSource(formatData(res))
+        message.success('删除成功')
+      })
+      .catch(err => {
+        message.error('删除失败')
+        setIsLoading(false)
+      })
+  }
+
+  const editArticle = (e, record) => {
+    navigate('/index/addArticle/' + record.id)
+    PubSub.publish('selectKey', ['2'])
+  }
+
   const columns = [
     {
       title: '文章标题',
@@ -17,9 +46,15 @@ const ArticleList = () => {
       align: 'center',
     },
     {
-      title: '文章简介',
-      dataIndex: 'description',
-      key: 'description',
+      title: '文章分类',
+      dataIndex: 'categoryName',
+      key: 'category.name',
+      align: 'center',
+    },
+    {
+      title: '发布时间',
+      dataIndex: 'createTime',
+      key: 'createTime',
       align: 'center',
     },
 
@@ -29,7 +64,11 @@ const ArticleList = () => {
       key: 'operation',
       render: (text, record) => (
         <Space size='middle'>
-          <Button size='middle' type='primary'>
+          <Button
+            size='middle'
+            type='primary'
+            onClick={e => editArticle(e, record)}
+          >
             修改
           </Button>
           <Popconfirm
@@ -42,7 +81,6 @@ const ArticleList = () => {
               删除
             </Button>
           </Popconfirm>
-          ,
         </Space>
       ),
       align: 'center',
@@ -50,23 +88,18 @@ const ArticleList = () => {
   ]
 
   useEffect(() => {
+    setIsLoading(true)
     request.post('/articles/list').then(res => {
-      console.log(res.data)
-      const data = res.data.map(item => {
-        item.key = item.id
-        return item
-      })
-      setDataSource(data)
+      setDataSource(formatData(res))
+      setIsLoading(false)
     })
   }, [])
 
-  useEffect(() => {
-    console.log(1);
-  }, [dataSource])
-
   return (
     <div>
-      <Table dataSource={dataSource} columns={columns} />;
+      <Spin tip='loading' spinning={isLoading}>
+        <Table dataSource={dataSource} columns={columns} />
+      </Spin>
     </div>
   )
 }
