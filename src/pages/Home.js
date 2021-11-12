@@ -59,7 +59,7 @@ function Home() {
             </Menu.Item>
           </SubMenu>
           <Menu.Item key='5' icon={<UserOutlined />}>
-            <Link to='profile'>个人设置</Link>
+            <Link to='profile'>个人介绍</Link>
           </Menu.Item>
         </Menu>
       </Sider>

@@ -70,10 +70,9 @@ const AddArticle = () => {
     if (isEdit) {
       // 编辑文章
       request
-        .get('/articles/' + params.id, {
-          title,
-          content,
-          category: categoryId,
+        .post('/articles/detail', {
+          id: params.id,
+          username: JSON.parse(localStorage.getItem('coding-blog')).username,
         })
         .then(res => {
           setCategoryId(res.data.category.id)

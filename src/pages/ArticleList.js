@@ -11,7 +11,7 @@ const ArticleList = () => {
 
   // 处理请求的文章数据
   const formatData = res => {
-    return res.data.map(item => {
+    return res.data.reverse().map(item => {
       item.key = item.id
       item.createTime = item.createTime.slice(0, 10)
       item.categoryName = item.category.name

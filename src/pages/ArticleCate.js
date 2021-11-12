@@ -46,7 +46,7 @@ const ArticleCate = () => {
         setConfirmLoading(false)
         setIsLoading(false)
         setCategories(
-          res.data.map(item => {
+          res.data.reverse().map(item => {
             item.key = item.id
             return item
           })
@@ -75,7 +75,7 @@ const ArticleCate = () => {
     request
       .get('/categories/list/' + JSON.parse(localStorage.getItem('coding-blog')).username)
       .then(res => {
-        const categories = res.data.map(item => {
+        const categories = res.data.reverse().map(item => {
           item.key = item.id
           return item
         })
