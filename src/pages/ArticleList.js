@@ -6,6 +6,7 @@ import request from '../request/request'
 const ArticleList = () => {
   const [dataSource, setDataSource] = useState([])
   const [isLoading, setIsLoading] = useState(false)
+  const [total, setTotal] = useState(0)
   const navigate = useNavigate()
 
   // 处理请求的文章数据
@@ -25,9 +26,11 @@ const ArticleList = () => {
       .then(res => {
         setIsLoading(false)
         setDataSource(formatData(res))
+        setTotal(total => total - 1)
         message.success('删除成功')
       })
       .catch(err => {
+        console.log(err)
         message.error('删除失败')
         setIsLoading(false)
       })
@@ -89,16 +92,28 @@ const ArticleList = () => {
 
   useEffect(() => {
     setIsLoading(true)
-    request.post('/articles/list').then(res => {
-      setDataSource(formatData(res))
-      setIsLoading(false)
-    })
+    request
+      .get('/articles/list/' + JSON.parse(localStorage.getItem('coding-blog')).username)
+      .then(res => {
+        setDataSource(formatData(res))
+        setTotal(res.data.length)
+        setIsLoading(false)
+      })
   }, [])
 
   return (
     <div>
       <Spin tip='loading' spinning={isLoading}>
-        <Table dataSource={dataSource} columns={columns} />
+        <Table
+          dataSource={dataSource}
+          columns={columns}
+          pagination={{
+            defaultCurrent: 1,
+            defaultPageSize: 10,
+            total,
+            showTotal: total => `共${total}篇文章`,
+          }}
+        />
       </Spin>
     </div>
   )

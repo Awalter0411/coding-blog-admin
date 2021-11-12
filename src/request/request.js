@@ -7,9 +7,10 @@ const request = axios.create({
 request.interceptors.request.use(
   function (config) {
     // 携带token
-    if (localStorage.getItem('token')) {
+    if (JSON.parse(localStorage.getItem('coding-blog'))) {
       config.headers = {
-        Authorization: 'Bearer ' + localStorage.getItem('token'),
+        Authorization:
+          'Bearer ' + JSON.parse(localStorage.getItem('coding-blog')).token,
       }
     }
     return config

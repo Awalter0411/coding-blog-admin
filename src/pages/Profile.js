@@ -21,11 +21,11 @@ const Profile = () => {
   }, [])
 
   const handleEdit = () => {
-    if(!username || !desc) {
+    if (!username || !desc) {
       message.error('请确认表单填写完整')
       return
     }
-    if(oldPassword === newPassword) {
+    if (oldPassword === newPassword) {
       message.error('修改前后的密码不能一致')
       return
     }
@@ -35,7 +35,7 @@ const Profile = () => {
         username,
         desc,
         oldPassword,
-        newPassword
+        newPassword,
       })
       .then(res => {
         console.log(res)
@@ -55,7 +55,7 @@ const Profile = () => {
         <Card
           title={'个人设置'}
           bordered={true}
-          style={{ width: 800, height: 500 }}
+          style={{ width: 800 }}
         >
           <Form
             layout='horizontal'
@@ -70,27 +70,27 @@ const Profile = () => {
                 }}
               />
             </Form.Item>
-            <Form.Item label='原密码'>
+            {/* <Form.Item label='原密码'>
               <Input
-                type="password"
+                type='password'
                 value={oldPassword}
                 onChange={e => setOldPassword(e.target.value)}
               />
             </Form.Item>
             <Form.Item label='新密码'>
               <Input
-                type="password"
+                type='password'
                 value={newPassword}
                 onChange={e => setnewPassword(e.target.value)}
               />
-            </Form.Item>
+            </Form.Item> */}
             <Form.Item label='个人介绍'>
               <MarkdownEditor
                 value={desc}
                 onChange={(editor, data, value) => {
                   setDesc(value)
                 }}
-                height={130}
+                height={150}
               />
             </Form.Item>
             <div className='button-container'>

@@ -19,12 +19,16 @@ const Login = () => {
       })
       .then(res => {
         message.success('登录成功')
-        localStorage.setItem('token', res.data.token)
+        // localStorage.setItem('token', res.data.token)
+        // localStorage.setItem('username', res.data.username)
+        console.log(res.data)
+        localStorage.setItem("coding-blog",JSON.stringify(res.data))
         navigate('/index', { replace: true })
         setIsLoading(false)
       })
       .catch(err => {
         setIsLoading(false)
+        console.log(err)
         message.error('用户名或密码错误')
       })
   }

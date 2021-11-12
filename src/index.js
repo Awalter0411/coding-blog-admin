@@ -19,7 +19,7 @@ ReactDOM.render(
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<App />}>
-          <Route path='login' element={<Login />} />
+          <Route path='login' element={<Login/>} />
           <Route path='index' element={<Home />}>
             <Route path='workspace' element={<WorkSpace />} />
             <Route path='addArticle' element={<AddArticle />} />
@@ -27,9 +27,9 @@ ReactDOM.render(
             <Route path='articleList' element={<ArticleList />} />
             <Route path='articleCate' element={<ArticleCate />} />
             <Route path='profile' element={<Profile />} />
+            <Route path='*' element={<Error />} />
           </Route>
         </Route>
-        <Route path='*' element={<Error />} />
       </Routes>
     </BrowserRouter>
   </ConfigProvider>,

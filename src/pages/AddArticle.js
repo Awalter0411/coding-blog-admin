@@ -22,18 +22,14 @@ const AddArticle = () => {
   // 分类
   const [categories, setCategories] = useState([])
   const [categoryId, setCategoryId] = useState('请选择分类')
-  // 简介
-  const [description, setDescription] = useState('')
 
   // 发布文章的回调
   const publish = () => {
     // 如果是添加文章
     if (!isEdit) {
-      setDescription()
       request
         .post('/articles/create', {
           title,
-          description,
           content,
           category: categoryId,
         })
@@ -51,7 +47,6 @@ const AddArticle = () => {
         .post('/articles/update', {
           id: parseInt(params.id),
           title,
-          description,
           content,
           category: categoryId,
         })
@@ -64,15 +59,19 @@ const AddArticle = () => {
   }
 
   useEffect(() => {
-    request.get('categories/list').then(res => {
-      setCategories(res.data)
-    })
+    request
+      .get(
+        'categories/list/' +
+          JSON.parse(localStorage.getItem('coding-blog')).username
+      )
+      .then(res => {
+        setCategories(res.data)
+      })
     if (isEdit) {
       // 编辑文章
       request
         .get('/articles/' + params.id, {
           title,
-          description,
           content,
           category: categoryId,
         })
@@ -83,11 +82,6 @@ const AddArticle = () => {
         })
     }
   }, [])
-
-  useEffect(() => {
-    setDescription(content.slice(0, 30))
-    return () => {}
-  }, [content])
 
   const handleCateChange = val => {
     setCategoryId(val)

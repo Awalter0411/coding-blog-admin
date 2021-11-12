@@ -12,7 +12,7 @@ import {
 import { useEffect, useState, useRef } from 'react'
 import '../static/css/ArticleCate.css'
 import request from '../request/request'
-
+const { Column } = Table
 const ArticleCate = () => {
   // 模态框显示
   const [visible, setVisible] = useState(false)
@@ -23,6 +23,8 @@ const ArticleCate = () => {
   // 分类
   const [categories, setCategories] = useState([])
   const [isLoading, setIsLoading] = useState(false)
+  // 分页
+  const [total, setTotal] = useState(0)
   const input = useRef(null)
 
   // 显示模态框
@@ -31,7 +33,7 @@ const ArticleCate = () => {
   }
 
   // 确认添加分类
-  const handleOk = () => {
+  const handleOk = e => {
     setConfirmLoading(true)
     setIsLoading(true)
     request
@@ -49,30 +51,38 @@ const ArticleCate = () => {
             return item
           })
         )
+        setTotal(res.data.length)
+        // todo fix:模态框内容清空
         setCateName('')
       })
       .catch(err => {
-        message.error('分类已经存在')
+        console.log(err)
+        message.error('添加分类失败')
         setConfirmLoading(false)
         setIsLoading(false)
       })
   }
 
   // 取消添加
-  const handleCancel = () => {
+  const handleCancel = e => {
     setVisible(false)
+    setCateName('')
   }
 
+  // 初始化数据
   useEffect(() => {
     setIsLoading(true)
-    request.get('/categories/list').then(res => {
-      const categories = res.data.map(item => {
-        item.key = item.id
-        return item
+    request
+      .get('/categories/list/' + JSON.parse(localStorage.getItem('coding-blog')).username)
+      .then(res => {
+        const categories = res.data.map(item => {
+          item.key = item.id
+          return item
+        })
+        setCategories(categories)
+        setIsLoading(false)
+        setTotal(res.data.length)
       })
-      setCategories(categories)
-      setIsLoading(false)
-    })
   }, [])
 
   // 删除分类的回调
@@ -87,6 +97,7 @@ const ArticleCate = () => {
       )
       message.success('删除成功')
       setIsLoading(false)
+      setTotal(res.data.length)
     })
   }
 
@@ -132,9 +143,9 @@ const ArticleCate = () => {
         <Modal
           title='添加分类'
           visible={visible}
-          onOk={handleOk}
+          onOk={e => handleOk(e)}
           confirmLoading={confirmLoading}
-          onCancel={handleCancel}
+          onCancel={e => handleCancel(e)}
         >
           <Form
             name='basic'
@@ -151,6 +162,7 @@ const ArticleCate = () => {
             >
               <Input
                 value={cateName}
+                placeholder={'请输入分类'}
                 ref={input}
                 onChange={e => setCateName(e.target.value)}
               />
@@ -158,10 +170,46 @@ const ArticleCate = () => {
           </Form>
         </Modal>
         <Table
-          columns={columns}
           dataSource={categories}
           style={{ marginTop: 20 + 'px' }}
-        />
+          pagination={{
+            defaultCurrent: 1,
+            defaultPageSize: 10,
+            total,
+            showTotal: total => `共${total}个分类`,
+            showSizeChanger: true,
+          }}
+        >
+          <Column
+            title='分类名称'
+            dataIndex='name'
+            align='center'
+            width={200}
+          />
+          <Column
+            title='操作'
+            render={(text, record) => (
+              <Space>
+                <Popconfirm
+                  title='删除该分类会删除其所有文章,确定要删除吗'
+                  onConfirm={e => confirmDelete(e, record)}
+                  okText='确定'
+                  cancelText='取消'
+                >
+                  <Button
+                    type='primary'
+                    size='middle'
+                    style={{ fontSize: 14 + 'px' }}
+                  >
+                    删除
+                  </Button>
+                </Popconfirm>
+              </Space>
+            )}
+            align='center'
+            width={200}
+          />
+        </Table>
       </Spin>
     </div>
   )
